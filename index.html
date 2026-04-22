@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ESC SOP</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+       background: #f8fafc; min-height: 100vh; display: flex; align-items: center;
+       justify-content: center; padding: 20px; }
+.container { max-width: 400px; width: 100%; }
+h1 { text-align: center; font-size: 1.3rem; color: #1e293b; margin-bottom: 8px; }
+.sub { text-align: center; font-size: 0.85rem; color: #64748b; margin-bottom: 32px; }
+.card { display: block; text-decoration: none; color: #1e293b;
+        background: #fff; border: 2px solid #e2e8f0; border-radius: 16px;
+        padding: 24px; margin-bottom: 16px; transition: all .2s;
+        -webkit-tap-highlight-color: transparent; }
+.card:hover, .card:active { border-color: #059669; box-shadow: 0 4px 12px rgba(5,150,105,.15); transform: translateY(-2px); }
+.card h2 { font-size: 1.1rem; margin-bottom: 4px; }
+.card .desc { font-size: 0.85rem; color: #64748b; }
+.card .badge { display: inline-block; font-size: 0.7rem; font-weight: 700; padding: 3px 10px;
+               border-radius: 12px; color: #fff; margin-top: 8px; }
+.odo .badge { background: #059669; }
+.obab .badge { background: #2563eb; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>ESC SOP Wiki</h1>
+  <p class="sub">Standard Operating Procedures</p>
+
+  <a href="odo/" class="card odo">
+    <h2>ODO Superette</h2>
+    <p class="desc">대치동 그랩앤고 매장운영 SOP + 체크리스트</p>
+    <span class="badge">SOP + Checklist</span>
+  </a>
+
+  <a href="obab/" class="card obab">
+    <h2>Obab (오늘의밥상)</h2>
+    <p class="desc">매장운영 SOP 위키</p>
+    <span class="badge">SOP Wiki</span>
+  </a>
+</div>
+</body>
+</html>
