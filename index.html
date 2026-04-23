@@ -238,6 +238,57 @@ header h1 { font-size: 1.2rem; font-weight: 700; }
 .cl-complete .icon { font-size: 3rem; margin-bottom: 8px; }
 .cl-complete .msg { font-size: 1.1rem; font-weight: 700; color: var(--primary); }
 
+/* ── Name input ── */
+.cl-name-bar { display: flex; gap: 8px; margin-bottom: 14px; }
+.cl-name-input { flex: 1; padding: 10px 14px; border: 2px solid var(--border); border-radius: 10px;
+                 font-size: 0.9rem; background: var(--card); color: var(--text); outline: none;
+                 transition: border-color .2s; }
+.cl-name-input:focus { border-color: var(--primary); }
+.cl-name-input::placeholder { color: var(--text-light); }
+
+/* ── Submit button ── */
+.cl-submit-btn { padding: 14px 24px; border: none; border-radius: 10px;
+                 background: var(--primary); color: #fff; font-size: 0.95rem;
+                 font-weight: 700; cursor: pointer; transition: all .15s; width: 100%;
+                 margin-bottom: 12px; }
+.cl-submit-btn:hover { background: var(--primary-dark); }
+.cl-submit-btn:disabled { background: var(--border); color: var(--text-muted); cursor: not-allowed; }
+
+/* ── Submitted banner ── */
+.cl-submitted { background: var(--check-bg); border: 2px solid var(--check-border);
+                border-radius: 10px; padding: 16px; text-align: center; margin-bottom: 16px; }
+.cl-submitted .icon { font-size: 1.5rem; margin-bottom: 4px; }
+.cl-submitted .msg { font-size: 0.9rem; font-weight: 600; color: var(--primary); }
+.cl-submitted .time { font-size: 0.8rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Share button ── */
+.cl-share-btn { padding: 10px 20px; border: 2px solid var(--primary); border-radius: 8px;
+                background: transparent; color: var(--primary); font-size: 0.85rem;
+                font-weight: 600; cursor: pointer; transition: all .15s; }
+.cl-share-btn:hover { background: var(--primary); color: #fff; }
+
+/* ══ HISTORY PAGE ══ */
+.hist-empty { text-align: center; padding: 40px; color: var(--text-muted); }
+.hist-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px;
+             padding: 14px; margin-bottom: 8px; }
+.hist-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.hist-date { font-weight: 700; font-size: 0.95rem; }
+.hist-role { font-size: 0.7rem; padding: 3px 10px; border-radius: 12px; color: #fff; font-weight: 600; }
+.hist-role.lead_manager { background: var(--tag-lead_manager); }
+.hist-role.manager { background: var(--tag-manager); }
+.hist-meta { display: flex; justify-content: space-between; align-items: center;
+             font-size: 0.8rem; color: var(--text-muted); margin-bottom: 8px; }
+.hist-progress { height: 6px; background: var(--progress-bg); border-radius: 3px; overflow: hidden;
+                 margin-bottom: 6px; }
+.hist-progress-fill { height: 100%; background: var(--primary); border-radius: 3px; }
+.hist-tasks { font-size: 0.78rem; color: var(--text-muted); }
+.hist-tasks .done { color: var(--primary); }
+.hist-tasks .missed { color: var(--danger); }
+.hist-delete { background: none; border: none; color: var(--text-light); cursor: pointer;
+               font-size: 0.75rem; padding: 4px 8px; border-radius: 4px; }
+.hist-delete:hover { color: var(--danger); background: var(--chip-bg); }
+.hist-filter { display: flex; gap: 6px; margin-bottom: 16px; }
+
 @media (max-width: 640px) {
   .container { padding: 12px; }
   header h1 { font-size: 1.05rem; }
@@ -252,14 +303,15 @@ header h1 { font-size: 1.2rem; font-weight: 700; }
     <div class="header-top">
       <h1>Obab SOP</h1>
       <div class="header-right">
-        <div class="header-meta">빌드 2026-04-23 20:42</div>
+        <div class="header-meta">빌드 2026-04-23 20:51</div>
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="테마 전환" title="라이트/다크 전환">
           <span id="theme-icon">&#127769;</span>
         </button>
       </div>
     </div>
     <div class="mode-tabs">
-      <button class="mode-tab active" data-mode="checklist">오늘 체크리스트</button>
+      <button class="mode-tab active" data-mode="checklist">체크리스트</button>
+      <button class="mode-tab" data-mode="history">제출 이력</button>
       <button class="mode-tab" data-mode="wiki">SOP 위키</button>
     </div>
   </div>
@@ -269,11 +321,16 @@ header h1 { font-size: 1.2rem; font-weight: 700; }
 <div class="container page active" id="page-checklist">
   <div class="cl-header">
     <div class="cl-date" id="cl-date"></div>
+    <div class="cl-name-bar">
+      <input type="text" class="cl-name-input" id="cl-name" placeholder="이름을 입력하세요" autocomplete="off">
+    </div>
     <div class="cl-role-selector">
       <button class="cl-role-btn active" data-role="lead_manager">리드매니저</button>
       <button class="cl-role-btn" data-role="manager">매니저</button>
     </div>
   </div>
+
+  <div id="cl-submitted-banner"></div>
 
   <div class="cl-cycle-bar" id="cl-cycle-bar">
     <button class="cl-cycle-btn active" data-cycle="매일">매일</button>
@@ -299,8 +356,22 @@ header h1 { font-size: 1.2rem; font-weight: 700; }
   </div>
 
   <div class="cl-footer">
-    <button class="cl-reset-btn" id="cl-reset">오늘 체크 초기화</button>
+    <button class="cl-submit-btn" id="cl-submit">체크리스트 제출</button>
+    <div style="display:flex;gap:8px;justify-content:center;">
+      <button class="cl-share-btn" id="cl-share">공유 복사</button>
+      <button class="cl-reset-btn" id="cl-reset">초기화</button>
+    </div>
   </div>
+</div>
+
+<!-- ═══ HISTORY PAGE ═══ -->
+<div class="container page" id="page-history">
+  <div class="hist-filter" id="hist-filter">
+    <button class="filter-btn active" data-hf="all">전체</button>
+    <button class="filter-btn" data-hf="lead_manager">리드매니저</button>
+    <button class="filter-btn" data-hf="manager">매니저</button>
+  </div>
+  <div id="hist-list"></div>
 </div>
 
 <!-- ═══ WIKI PAGE ═══ -->
@@ -574,7 +645,7 @@ function renderChecklist() {
 document.querySelectorAll(".cl-role-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".cl-role-btn").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active"); clRole = btn.dataset.role; renderChecklist();
+    btn.classList.add("active"); clRole = btn.dataset.role; renderChecklist(); checkSubmitted();
   });
 });
 document.querySelectorAll(".cl-cycle-btn").forEach(btn => {
@@ -590,6 +661,206 @@ document.getElementById("cl-reset").addEventListener("click", () => {
 });
 
 renderChecklist();
+
+// ══════════════════════════════════════════
+// NAME PERSISTENCE
+// ══════════════════════════════════════════
+const nameInput = document.getElementById("cl-name");
+const savedName = localStorage.getItem("obab-sop-username") || "";
+nameInput.value = savedName;
+nameInput.addEventListener("input", () => {
+  localStorage.setItem("obab-sop-username", nameInput.value.trim());
+});
+
+// ══════════════════════════════════════════
+// SUBMIT
+// ══════════════════════════════════════════
+function getSubmitKey() { return `obab-sop-submit-${todayStr}-${clRole}`; }
+function getSubmission() {
+  try { return JSON.parse(localStorage.getItem(getSubmitKey())); } catch(e) { return null; }
+}
+function getAllSubmissions() {
+  try { return JSON.parse(localStorage.getItem("obab-sop-submissions") || "[]"); } catch(e) { return []; }
+}
+
+function checkSubmitted() {
+  const sub = getSubmission();
+  const banner = document.getElementById("cl-submitted-banner");
+  const submitBtn = document.getElementById("cl-submit");
+  if (sub) {
+    banner.innerHTML = `<div class="cl-submitted">
+      <div class="icon">&#9989;</div>
+      <div class="msg">${esc(sub.name)} — ${ROLES[sub.role]?ROLES[sub.role].name:sub.role} 제출 완료</div>
+      <div class="time">${sub.timestamp}</div>
+    </div>`;
+    submitBtn.textContent = "제출 완료";
+    submitBtn.disabled = true;
+  } else {
+    banner.innerHTML = "";
+    submitBtn.textContent = "체크리스트 제출";
+    submitBtn.disabled = false;
+  }
+}
+
+document.getElementById("cl-submit").addEventListener("click", () => {
+  const name = nameInput.value.trim();
+  if (!name) { alert("이름을 입력해주세요."); nameInput.focus(); return; }
+
+  const filtered = getFilteredCL();
+  const doneIds = filtered.filter(t => isChecked(t.id)).map(t => t.id);
+  const missedIds = filtered.filter(t => !isChecked(t.id)).map(t => t.id);
+  const total = filtered.length;
+  const doneCount = doneIds.length;
+
+  if (doneCount === 0) { alert("최소 1개 이상 체크 후 제출해주세요."); return; }
+  if (!confirm(`${name} (${ROLES[clRole]?ROLES[clRole].name:clRole})
+${doneCount}/${total} 완료 — 제출할까요?`)) return;
+
+  const now = new Date();
+  const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}-${String(now.getDate()).padStart(2,"0")} ${String(now.getHours()).padStart(2,"0")}:${String(now.getMinutes()).padStart(2,"0")}`;
+
+  const submission = {
+    date: todayStr,
+    role: clRole,
+    name: name,
+    timestamp: timestamp,
+    doneCount: doneCount,
+    total: total,
+    doneIds: doneIds,
+    missedIds: missedIds
+  };
+
+  // Save individual submission
+  localStorage.setItem(getSubmitKey(), JSON.stringify(submission));
+
+  // Append to submissions index
+  const all = getAllSubmissions();
+  // Remove existing same date+role if re-submitting
+  const idx = all.findIndex(s => s.date === todayStr && s.role === clRole);
+  if (idx !== -1) all.splice(idx, 1);
+  all.unshift(submission);
+  // Keep last 90 entries
+  if (all.length > 90) all.length = 90;
+  localStorage.setItem("obab-sop-submissions", JSON.stringify(all));
+
+  checkSubmitted();
+  renderChecklist();
+});
+
+checkSubmitted();
+
+// ══════════════════════════════════════════
+// SHARE (COPY TO CLIPBOARD)
+// ══════════════════════════════════════════
+document.getElementById("cl-share").addEventListener("click", () => {
+  const name = nameInput.value.trim() || "(이름없음)";
+  const filtered = getFilteredCL();
+  const doneIds = filtered.filter(t => isChecked(t.id));
+  const missedIds = filtered.filter(t => !isChecked(t.id));
+  const roleName = ROLES[clRole] ? ROLES[clRole].name : clRole;
+
+  let text = `[Obab SOP] ${todayStr} (${dayOfWeek})
+`;
+  text += `${name} / ${roleName}
+`;
+  text += `완료: ${doneIds.length}/${filtered.length} (${filtered.length ? Math.round(doneIds.length/filtered.length*100) : 0}%)
+`;
+  text += `──────────
+`;
+  if (doneIds.length) {
+    text += `✅ 완료:
+`;
+    doneIds.forEach(t => { text += `  ${t.id} ${t["업무명"]}
+`; });
+  }
+  if (missedIds.length) {
+    text += `⬜ 미완료:
+`;
+    missedIds.forEach(t => { text += `  ${t.id} ${t["업무명"]}
+`; });
+  }
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => alert("클립보드에 복사되었습니다."));
+  } else {
+    // fallback
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    document.execCommand("copy"); document.body.removeChild(ta);
+    alert("클립보드에 복사되었습니다.");
+  }
+});
+
+// ══════════════════════════════════════════
+// HISTORY PAGE
+// ══════════════════════════════════════════
+let histFilter = "all";
+
+function renderHistory() {
+  const all = getAllSubmissions();
+  const filtered = histFilter === "all" ? all : all.filter(s => s.role === histFilter);
+  const listEl = document.getElementById("hist-list");
+
+  if (!filtered.length) {
+    listEl.innerHTML = '<div class="hist-empty">제출 이력이 없습니다.</div>';
+    return;
+  }
+
+  let h = "";
+  for (const s of filtered) {
+    const pct = s.total ? Math.round(s.doneCount / s.total * 100) : 0;
+    const roleName = ROLES[s.role] ? ROLES[s.role].name : s.role;
+    const missedList = (s.missedIds || []).map(id => {
+      const t = TASKS.find(t => t.id === id);
+      return t ? `${id} ${t["업무명"]}` : id;
+    });
+    const doneList = (s.doneIds || []).map(id => {
+      const t = TASKS.find(t => t.id === id);
+      return t ? `${id} ${t["업무명"]}` : id;
+    });
+
+    h += `<div class="hist-card">
+      <div class="hist-top">
+        <span class="hist-date">${esc(s.date)}</span>
+        <span class="hist-role ${s.role}">${esc(roleName)}</span>
+      </div>
+      <div class="hist-meta">
+        <span>${esc(s.name)} &middot; ${esc(s.timestamp)}</span>
+        <button class="hist-delete" onclick="deleteSubmission('${s.date}','${s.role}')">삭제</button>
+      </div>
+      <div class="hist-progress"><div class="hist-progress-fill" style="width:${pct}%"></div></div>
+      <div class="hist-tasks">
+        <span class="done">✅ ${s.doneCount}개 완료</span> &middot;
+        <span class="${s.missedIds && s.missedIds.length ? 'missed' : ''}">${s.total - s.doneCount}개 미완료</span>
+        &middot; ${pct}%
+      </div>
+      ${missedList.length ? `<details style="margin-top:8px"><summary style="font-size:0.78rem;color:var(--text-muted);cursor:pointer">미완료 항목 (${missedList.length})</summary><div style="font-size:0.75rem;color:var(--danger);margin-top:4px;white-space:pre-line">${missedList.map(esc).join("\n")}</div></details>` : ""}
+    </div>`;
+  }
+  listEl.innerHTML = h;
+}
+
+function deleteSubmission(date, role) {
+  if (!confirm("이 제출 이력을 삭제할까요?")) return;
+  const all = getAllSubmissions();
+  const idx = all.findIndex(s => s.date === date && s.role === role);
+  if (idx !== -1) all.splice(idx, 1);
+  localStorage.setItem("obab-sop-submissions", JSON.stringify(all));
+  localStorage.removeItem(`obab-sop-submit-${date}-${role}`);
+  renderHistory();
+  checkSubmitted();
+}
+
+document.querySelectorAll("#hist-filter .filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll("#hist-filter .filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    histFilter = btn.dataset.hf;
+    renderHistory();
+  });
+});
+
+renderHistory();
 
 // ══════════════════════════════════════════
 // THEME TOGGLE
